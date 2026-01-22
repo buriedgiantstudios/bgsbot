@@ -51,6 +51,7 @@ export class Bot {
         }
 
         service.init(client);
+        this.logger.log(`Initialized service ${key}`);
       }
     });
 

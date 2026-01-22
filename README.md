@@ -22,3 +22,7 @@ Put these values in a [`.env`](https://www.npmjs.com/package/dotenv) file.
 ### Building
 
 You don't need to build the app to deploy it. Just use ts-node, it's not that intensive.
+
+## Docker
+
+We use Docker to deploy this bot, and you can too. Use `docker pull ghcr.io/buriedgiantstudios/bgsbot:edge` to get the latest image
