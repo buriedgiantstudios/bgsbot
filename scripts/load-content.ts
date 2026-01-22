@@ -9,29 +9,20 @@ const start = async () => {
   fs.ensureDirSync("content/cards");
   fs.ensureDirSync("content/rules");
 
-  const cards = await fetch("https://ledercardcdn.seiyria.com/cards.json");
+  const cards = await fetch("https://cardcdn.buriedgiantstudios.com/cards.json");
   fs.writeJsonSync("content/data/cards.json", await cards.json());
 
   console.log("cloned cards data");
 
-  const faq = await fetch("https://ledercardcdn.seiyria.com/faq.json");
+  const faq = await fetch("https://cardcdn.buriedgiantstudios.com/faq.json");
   fs.writeJsonSync("content/data/faq.json", await faq.json());
 
   console.log("cloned faq data");
 
-  const errata = await fetch("https://ledercardcdn.seiyria.com/errata.json");
+  const errata = await fetch("https://cardcdn.buriedgiantstudios.com/errata.json");
   fs.writeJsonSync("content/data/errata.json", await errata.json());
 
   console.log("cloned errata data");
-
-  const meta = await fetch("https://ledercardcdn.seiyria.com/meta.json");
-  const metaData = await meta.json();
-  const products = metaData.products;
-
-  const productList = products
-    .filter((p) => p.external.rules)
-    .map((p) => ({ name: p.name, value: p.id }));
-  fs.writeJsonSync("content/data/products.json", productList);
 
   console.log("cloning rules");
 
@@ -54,6 +45,19 @@ const start = async () => {
     console.log("got rules for", productId);
     fs.writeJsonSync(`content/rules/${productId}.json`, latestRulesVersion);
   });
+
+  console.log("cloned rules");
+
+  const meta = await fetch("https://cardcdn.buriedgiantstudios.com/meta.json");
+  const metaData = await meta.json();
+  const products = metaData.products;
+
+  const productList = products
+    .filter((p) => p.external.rules && rulesData[p.id])
+    .map((p) => ({ name: p.name, value: p.id }));
+  fs.writeJsonSync("content/data/products.json", productList);
+
+  console.log("cloned product list");
 
   /*
   console.log("cloning card images and symbols...");

@@ -38,7 +38,9 @@ export class Bot {
 
     client.login(DISCORD_TOKEN);
 
-    client.on(Discord.Events.ClientReady, () => {
+    client.on(Discord.Events.ClientReady, async () => {
+      await this.createAndDeployCommands(client);
+
       this.logger.log("Initialized bot!");
 
       // auto-register all services
@@ -51,8 +53,6 @@ export class Bot {
         service.init(client);
       }
     });
-
-    await this.createAndDeployCommands();
 
     client.on(Discord.Events.InteractionCreate, async (interaction) => {
       if (!interaction.isChatInputCommand()) return;
@@ -86,7 +86,7 @@ export class Bot {
     });
   }
 
-  private async createAndDeployCommands() {
+  private async createAndDeployCommands(client: Discord.Client) {
     const commandList = [];
 
     Object.keys(Commands).forEach((commandName) => {
@@ -101,19 +101,10 @@ export class Bot {
 
     if (this.envService.discordServer) {
       this.logger.log("Registering specific guild commands.");
-      await rest.put(
-        Discord.Routes.applicationGuildCommands(
-          this.envService.discordClient,
-          this.envService.discordServer
-        ),
-        { body: commandList }
-      );
+      client.application.commands.set(commandList, this.envService.discordServer);
     } else {
       this.logger.log("Registering global commands.");
-      await rest.put(
-        Discord.Routes.applicationCommands(this.envService.discordClient),
-        { body: commandList }
-      );
+      client.application.commands.set(commandList);
     }
 
     this.logger.log(`Successfully reloaded application (/) commands.`);

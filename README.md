@@ -1,6 +1,6 @@
-# Root Bot
+# Buried Giant Studios Bot
 
-A bot made for the Woodland Warriors Discord.
+A bot made for the Buried Giant Studios Discord.
 
 ## Environment Variables
 
