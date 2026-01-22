@@ -101,7 +101,7 @@ export class RulesService extends BaseService {
   }
 
   public getRuleURL(game: string, rule: IRule): string {
-    return `https://rules.ledergames.com/?game=${game}#${this.slugTitle(
+    return `https://rules.buriedgiantstudios.com/?game=${game}#${this.slugTitle(
       rule.index,
       rule.name
     )}`;

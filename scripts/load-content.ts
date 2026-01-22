@@ -35,7 +35,7 @@ const start = async () => {
 
   console.log("cloning rules");
 
-  const rules = await fetch("https://rules.ledergames.com/rules.json");
+  const rules = await fetch("https://rules.buriedgiantstudios.com/rules.json");
   const rulesData = await rules.json();
 
   Object.keys(rulesData).forEach((productId) => {
