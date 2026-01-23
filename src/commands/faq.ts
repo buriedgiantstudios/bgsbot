@@ -15,7 +15,7 @@ export class FAQCommand implements ICommand {
   data = new SlashCommandBuilder()
     .setName("faq")
     .setDescription(
-      "Retrieve card FAQ for any card in the Leder Games catalog."
+      "Retrieve card FAQ for any card in the Buried Giant Studios catalog."
     )
     .addStringOption((option) =>
       option

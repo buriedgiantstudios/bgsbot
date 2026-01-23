@@ -15,7 +15,7 @@ export class ErrataCommand implements ICommand {
   data = new SlashCommandBuilder()
     .setName("errata")
     .setDescription(
-      "Retrieve card errata for any card in the Leder Games catalog."
+      "Retrieve card errata for any card in the Buried Giant Studios catalog."
     )
     .addStringOption((option) =>
       option

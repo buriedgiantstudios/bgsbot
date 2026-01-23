@@ -17,7 +17,7 @@ export class CardCommand implements ICommand {
   data = new SlashCommandBuilder()
     .setName("card")
     .setDescription(
-      "Retrieve card data for any card in the Leder Games catalog."
+      "Retrieve card data for any card in the Buried Giant Studios catalog."
     )
     .addStringOption((option) =>
       option

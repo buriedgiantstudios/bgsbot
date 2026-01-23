@@ -15,7 +15,7 @@ export class RuleCommand implements ICommand {
 
   data = new SlashCommandBuilder()
     .setName("rule")
-    .setDescription("Retrieve rules for any game in the Leder Games catalog.")
+    .setDescription("Retrieve rules for any game in the Buried Giant Studios catalog.")
     .addStringOption((option) =>
       option
         .setName("game")
