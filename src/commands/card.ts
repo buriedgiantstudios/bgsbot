@@ -78,14 +78,14 @@ export class CardCommand implements ICommand {
 
     text = text.split("`symbol:").join("<emoji>:symbol_").split("`").join("");
 
-    const matches = text.match(/<emoji>:([a-zA-Z0-9_])+/g);
+    const matches = text.match(/<emoji>:([a-zA-Z0-9_-])+/g);
     if (!matches || !matches[0]) {
       return text;
     }
 
     matches.forEach((match) => {
       const [_, replace] = match.split(":");
-      text = text.replace(match, this.emojiService.getEmoji(replace));
+      text = text.replace(match, this.emojiService.getEmoji(replace.replace(/-/g, "_")));
     });
 
     return text;
