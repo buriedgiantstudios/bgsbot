@@ -63,7 +63,7 @@ export class CardCommand implements ICommand {
       })
       .setThumbnail(cardData.image);
 
-    const text = this.formatTextForEmojis(cardData.text);
+    const text = this.emojiService.replaceTagsWithEmojis(cardData.text);
     if (text) {
       embed.setDescription(text);
     }
@@ -71,23 +71,5 @@ export class CardCommand implements ICommand {
     await interaction.reply({ embeds: [embed] });
 
     this.presence.setPresence(`with ${cardData.name}`);
-  }
-
-  private formatTextForEmojis(text: string): string {
-    if (!text) return "";
-
-    text = text.split("`symbol:").join("<emoji>:symbol_").split("`").join("");
-
-    const matches = text.match(/<emoji>:([a-zA-Z0-9_-])+/g);
-    if (!matches || !matches[0]) {
-      return text;
-    }
-
-    matches.forEach((match) => {
-      const [_, replace] = match.split(":");
-      text = text.replace(match, this.emojiService.getEmoji(replace.replace(/-/g, "_")));
-    });
-
-    return text;
   }
 }

@@ -23,6 +23,20 @@ export class EmojiService extends BaseService {
     return this.emojiInstanceHash[name];
   }
 
+  public replaceTagsWithEmojis(text: string) {
+    let match: RegExpMatchArray | null = null;
+
+    // tslint:disable-next-line:no-conditional-assignment
+    while ((match = text.match(/`([a-z\-_]+):([a-z\-_]+)(?::([0-9.]+))?`/))) {
+      const [replace, key, value, rule] = match;
+      const emoji = this.getEmoji(`${key}_${value.replace(/-/g, "_")}`) ?? `${key}:${value}`;
+      const replacement = rule ? `${emoji} (${rule})` : emoji;
+      text = text.replace(replace, replacement);
+    }
+
+    return text;
+  }
+
   private async loadEmojis() {
     (await this.client.application.emojis.fetch()).forEach((emoji) => {
       this.emojiHash[emoji.name] = emoji.toString();

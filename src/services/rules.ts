@@ -61,29 +61,8 @@ export class RulesService extends BaseService {
   }
 
   public fixRuleText(text: string) {
-    let match = null;
-
-    // replace nice faction icons
-    // tslint:disable-next-line:no-conditional-assignment
-    while ((match = text.match(/`faction:([a-z]+):([0-9.]+)`/))) {
-      const [replace, faction, rule] = match;
-
-      const factEmoji = this.emojiService.getEmoji(`faction_${faction}`);
-      text = text.replace(replace, `${factEmoji} (\`${rule}\`)`);
-    }
-
-    // replace nice item icons
-    // tslint:disable-next-line:no-conditional-assignment
-    while ((match = text.match(/`item:([a-z]+)`/))) {
-      const [replace, faction] = match;
-
-      const itemEmoji = this.emojiService.getEmoji(`item_${faction}`);
-      text = text.replace(replace, `${itemEmoji}`);
-    }
-
     text = text.split("rule:").join("");
-
-    return text;
+    return this.emojiService.replaceTagsWithEmojis(text);
   }
 
   public slugTitle(index: string, title: string): string {
@@ -101,7 +80,7 @@ export class RulesService extends BaseService {
   }
 
   public getRuleURL(game: string, rule: IRule): string {
-    return `https://rules.buriedgiantstudios.com/?game=${game}#${this.slugTitle(
+    return `https://rules.buriedgiantstudios.com/?product=${game}#${this.slugTitle(
       rule.index,
       rule.name
     )}`;
