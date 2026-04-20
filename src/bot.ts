@@ -1,7 +1,7 @@
 import * as Discord from "discord.js";
 import { Inject } from "typescript-ioc";
 
-import { ICommand, IService } from "./interfaces";
+import { ICommand } from "./interfaces";
 
 import { BaseService } from "./base/BaseService";
 import { EmojiService } from "./services/emoji";
@@ -12,6 +12,8 @@ import { PresenceService } from "./services/presence";
 import * as Commands from "./commands";
 import { CardService } from "./services/card";
 import { RulesService } from "./services/rules";
+import { replyOrFollowup } from "./utils";
+import { ComponentService } from "./services/component";
 
 export class Bot {
   // these services have to be registered first
@@ -23,6 +25,7 @@ export class Bot {
   @Inject private rulesService: RulesService;
   @Inject private emojiService: EmojiService;
   @Inject private presenceService: PresenceService;
+  @Inject private componentService: ComponentService;
 
   private commands = new Discord.Collection<string, ICommand>();
 
@@ -45,7 +48,7 @@ export class Bot {
 
       // auto-register all services
       for (const key in this) {
-        const service: IService = this[key] as unknown as IService;
+        const service = this[key];
         if (!(service instanceof BaseService)) {
           continue;
         }
@@ -56,56 +59,55 @@ export class Bot {
     });
 
     client.on(Discord.Events.InteractionCreate, async (interaction) => {
-      if (!interaction.isChatInputCommand()) return;
+      if (!interaction.isRepliable()) return;
       if (interaction.replied) return;
 
-      const command = this.commands.get(interaction.commandName);
-
-      if (!command) {
-        console.error(
-          `No command matching ${interaction.commandName} was found.`
-        );
-        return;
+      if (interaction.isMessageComponent()) {
+        this.componentService.handleInteraction(interaction);
       }
 
-      try {
-        await command.execute(interaction);
-      } catch (error) {
-        console.error(error);
-        if (interaction.replied || interaction.deferred) {
-          await interaction.followUp({
-            content: "There was an error while executing this command!",
-            ephemeral: true,
-          });
-        } else {
-          await interaction.reply({
+      if (interaction.isChatInputCommand()) {
+        const command = this.commands.get(interaction.commandName);
+  
+        if (!command) {
+          console.error(
+            `No command/component matching ${interaction.commandName} was found.`
+          );
+          return;
+        }
+  
+        try {
+          await command.execute(interaction);
+        } catch (error) {
+          console.error(error);
+          await replyOrFollowup(interaction, {
             content: "There was an error while executing this command!",
             ephemeral: true,
           });
         }
       }
+
     });
   }
 
   private async createAndDeployCommands(client: Discord.Client) {
-    const commandList = [];
+    const commandList: Array<Discord.RESTPostAPIChatInputApplicationCommandsJSONBody> = [];
 
     Object.keys(Commands).forEach((commandName) => {
-      const commandData = new Commands[commandName]();
+      const commandData = new Commands[commandName as keyof typeof Commands]();
       this.commands.set(commandData.data.name, commandData);
 
       commandList.push(commandData.data.toJSON());
     });
 
-    const rest = new Discord.REST().setToken(this.envService.discordToken);
     this.logger.log(`Started refreshing application (/) commands.`);
 
     if (this.envService.discordServer) {
       this.logger.log("Registering specific guild commands.");
-      client.application.commands.set(commandList, this.envService.discordServer);
+      client.application!.commands.set(commandList, this.envService.discordServer);
     } else {
       this.logger.log("Registering global commands.");
-      client.application.commands.set(commandList);
+      client.application!.commands.set(commandList);
     }
 
     this.logger.log(`Successfully reloaded application (/) commands.`);

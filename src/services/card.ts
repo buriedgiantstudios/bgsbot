@@ -1,14 +1,16 @@
 import * as fs from "fs-extra";
-import * as FuzzySet from "fuzzyset.js";
-import { AutoWired, Singleton } from "typescript-ioc";
+import FuzzySet from "fuzzyset.js";
+import { OnlyInstantiableByContainer, Singleton } from "typescript-ioc";
 
 import { BaseService } from "../base/BaseService";
+import * as Discord from "discord.js";
+import { ICard } from "../interfaces/ICard";
 
 @Singleton
-@AutoWired
+@OnlyInstantiableByContainer
 export class CardService extends BaseService {
-  private cardsByName: { [key: string]: any } = {};
-  private set: FuzzySet = new FuzzySet();
+  private cardsByName: { [key: string]: ICard } = {};
+  private set: FuzzySet = FuzzySet();
 
   private faq: Record<
     string,
@@ -22,7 +24,7 @@ export class CardService extends BaseService {
     Record<string, Array<{ errata: Array<{ text: string }>; card: string }>>
   > = {};
 
-  public async init(client) {
+  public async init(client: Discord.Client) {
     super.init(client);
 
     this.loadCards();
@@ -31,7 +33,7 @@ export class CardService extends BaseService {
     this.errata = fs.readJsonSync("./content/data/errata.json");
   }
 
-  public getCard(name: string): any {
+  public getCard(name: string) {
     const res = this.set.get(name);
     if (!res) {
       return null;
@@ -40,14 +42,23 @@ export class CardService extends BaseService {
     return this.cardsByName[res[0][1]];
   }
 
-  public getFAQsForCard(product: string, cardName: string): any[] {
+  public getCards(name: string) {
+    const res = this.set.get(name);
+    if (!res) {
+      return null;
+    }
+
+    return res.map((e) => this.cardsByName[e[1]]);
+  }
+
+  public getFAQsForCard(product: string, cardName: string) {
     const faqData = this.faq[product]?.["en-US"]?.find(
       (e) => e.card === cardName
     );
     return faqData?.faq ?? [];
   }
 
-  public getErratasForCard(product: string, cardName: string): any[] {
+  public getErratasForCard(product: string, cardName: string) {
     const errataData = this.errata[product]?.["en-US"]?.find(
       (e) => e.card === cardName
     );
@@ -57,10 +68,10 @@ export class CardService extends BaseService {
   private loadCards() {
     const cards = fs.readJsonSync("./content/data/cards.json");
 
-    cards.forEach((card) => {
-      this.cardsByName[card.name] = card;
+    cards.forEach((card: ICard) => {
+      this.cardsByName[card.name + card.id] = card;
       this.cardsByName[card.id] = card;
-      this.set.add(card.name);
+      this.set.add(card.name + card.id);
       this.set.add(card.id);
     });
   }

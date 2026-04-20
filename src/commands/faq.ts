@@ -25,7 +25,7 @@ export class FAQCommand implements ICommand {
     );
 
   public async execute(interaction: ChatInputCommandInteraction) {
-    const cardName = interaction.options.get("cardname").value as string;
+    const cardName = interaction.options.get("cardname")!.value as string;
     const cardData = this.cardService.getCard(cardName);
     if (!cardData) {
       await interaction.reply(

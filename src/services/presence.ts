@@ -1,10 +1,11 @@
-import { AutoWired, Singleton } from "typescript-ioc";
+import { OnlyInstantiableByContainer, Singleton } from "typescript-ioc";
 import { BaseService } from "../base/BaseService";
+import * as Discord from "discord.js";
 
 @Singleton
-@AutoWired
+@OnlyInstantiableByContainer
 export class PresenceService extends BaseService {
-  public async init(client) {
+  public async init(client: Discord.Client) {
     super.init(client);
 
     this.resetPresence();
@@ -15,7 +16,7 @@ export class PresenceService extends BaseService {
   }
 
   public setPresence(str: string, allowReset = true): void {
-    this.client.user.setPresence({ activities: [{ name: str }] });
+    this.client.user!.setPresence({ activities: [{ name: str }] });
 
     if (allowReset) {
       setTimeout(() => {

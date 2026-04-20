@@ -1,6 +1,6 @@
 import * as fs from "fs-extra";
-import * as FuzzySet from "fuzzyset.js";
-import { AutoWired, Inject, Singleton } from "typescript-ioc";
+import FuzzySet from "fuzzyset.js";
+import { OnlyInstantiableByContainer, Inject, Singleton } from "typescript-ioc";
 
 import { BaseService } from "../base/BaseService";
 import { IRule } from "../interfaces";
@@ -8,22 +8,23 @@ import { EmojiService } from "./emoji";
 
 import slugify from "slugify";
 import * as productList from "../../content/data/products.json";
+import * as Discord from 'discord.js';
 const products = (productList as any).default || productList;
 
 @Singleton
-@AutoWired
+@OnlyInstantiableByContainer
 export class RulesService extends BaseService {
   @Inject private emojiService: EmojiService;
 
   private rulesHash: Record<string, Record<string, IRule>> = {};
   private ruleSets: Record<string, FuzzySet> = {};
 
-  public async init(client) {
+  public async init(client: Discord.Client) {
     super.init(client);
 
-    products.forEach((product) => {
+    products.forEach((product: { value: string }) => {
       this.rulesHash[product.value] = {};
-      this.ruleSets[product.value] = new FuzzySet();
+      this.ruleSets[product.value] = FuzzySet();
 
       this.loadRules(product.value);
     });
@@ -42,7 +43,7 @@ export class RulesService extends BaseService {
     ];
   }
 
-  public getRule(game: string, name: string): IRule {
+  public getRule(game: string, name: string): IRule | null {
     const res = this.ruleSets[game].get(name);
     if (!res) {
       return null;
@@ -51,7 +52,7 @@ export class RulesService extends BaseService {
     return this.rulesHash[game][res[0][1]];
   }
 
-  public getRules(game: string, name: string): IRule[] {
+  public getRules(game: string, name: string): Record<string, IRule>[] {
     const res = this.ruleSets[game].get(name, "", 0.5);
     if (!res) {
       return [];

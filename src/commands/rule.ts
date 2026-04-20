@@ -31,8 +31,8 @@ export class RuleCommand implements ICommand {
     );
 
   public async execute(interaction: ChatInputCommandInteraction) {
-    const game = interaction.options.get("game").value as string;
-    const rule = interaction.options.get("rule").value as string;
+    const game = interaction.options.get("game")!.value as string;
+    const rule = interaction.options.get("rule")!.value as string;
 
     const ruleData = this.rulesService.getRule(game, rule);
     if (!ruleData) {

@@ -1,18 +1,22 @@
 import {
+  ActionRowBuilder,
   ChatInputCommandInteraction,
-  EmbedBuilder,
+  MessageActionRowComponentBuilder,
   SlashCommandBuilder,
 } from "discord.js";
 import { Inject } from "typescript-ioc";
 import { ICommand } from "../interfaces";
 import { CardService } from "../services/card";
-import { EmojiService } from "../services/emoji";
 import { PresenceService } from "../services/presence";
+import { EmbedService } from "../services/embed";
+import { CardSelect } from "../components";
 
 export class CardCommand implements ICommand {
   @Inject private cardService: CardService;
-  @Inject private emojiService: EmojiService;
+  @Inject private embedService: EmbedService;
   @Inject private presence: PresenceService;
+
+  @Inject private cardSelect: CardSelect;
 
   data = new SlashCommandBuilder()
     .setName("card")
@@ -27,49 +31,30 @@ export class CardCommand implements ICommand {
     );
 
   public async execute(interaction: ChatInputCommandInteraction) {
-    const cardName = interaction.options.get("cardname").value as string;
-    const cardData = this.cardService.getCard(cardName);
-    if (!cardData) {
+    const cardName = interaction.options.get("cardname")!.value as string;
+    const cardsData = this.cardService.getCards(cardName);
+    if (!cardsData) {
       await interaction.reply(
         `Could not find a card with a name or id like "${cardName}".`
       );
       return;
     }
 
+    const mainCardData = cardsData[0];
     const faqData = this.cardService.getFAQsForCard(
-      cardData.game,
-      cardData.name
+      mainCardData.game,
+      mainCardData.name
     );
     const errataData = this.cardService.getErratasForCard(
-      cardData.game,
-      cardData.name
+      mainCardData.game,
+      mainCardData.name
     );
 
-    /*
-    const realImage = path.basename(cardData.image, ".webp");
-
-    const attachFiles = [
-      new AttachmentBuilder(
-        `./content/cards/images/${cardData.game}/en-US/${realImage}.png`
-      ),
-    ];
-    */
-
-    const embed = new EmbedBuilder()
-      .setTitle(cardData.name)
-      .setURL(`https://cards.buriedgiantstudios.com/card/${cardData.id}`)
-      .setFooter({
-        text: `${cardData.id} - ${faqData.length} FAQ | ${errataData.length} Errata`,
-      })
-      .setThumbnail(cardData.image);
-
-    const text = this.emojiService.replaceTagsWithEmojis(cardData.text);
-    if (text) {
-      embed.setDescription(text);
-    }
-
-    await interaction.reply({ embeds: [embed] });
-
-    this.presence.setPresence(`with ${cardData.name}`);
+    const embed = this.embedService.getCardEmbed(mainCardData, faqData, errataData);
+    const components = cardsData.length > 1
+      ? [new ActionRowBuilder<MessageActionRowComponentBuilder>().addComponents(this.cardSelect.build(cardsData))]
+      : undefined;
+    await interaction.reply({ embeds: [embed], components: components });
+    this.presence.setPresence(`with ${mainCardData.name}`);
   }
 }

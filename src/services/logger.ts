@@ -1,30 +1,25 @@
 
 // tslint:disable:no-console
 
-import { AutoWired, Singleton } from 'typescript-ioc';
+import { OnlyInstantiableByContainer, Singleton } from 'typescript-ioc';
 import { BaseService } from '../base/BaseService';
-import { ICommandResult } from '../interfaces';
+import * as Discord from 'discord.js';
 
 @Singleton
-@AutoWired
+@OnlyInstantiableByContainer
 export class Logger extends BaseService {
 
-  public async init(client) {
+  public async init(client: Discord.Client) {
     super.init(client);
 
     this.watchGlobalUncaughtExceptions();
   }
 
-  log(...args) {
+  log(...args: Array<unknown>) {
     console.log(this.timeStamp(), ...args);
   }
 
-  logCommandResult(result: ICommandResult) {
-    if (!result || (result && !result.result && !result.resultString)) { return; }
-    this.log(result);
-  }
-
-  error(...args) {
+  error(...args: Array<unknown>) {
     console.error(this.timeStamp(), ...args);
   }
 
