@@ -12,6 +12,6 @@ export function ellipsize(text: string, maxLength: number = 100) {
 	if (text.length <= maxLength) {
 		return text;
 	} else {
-		return text.slice(0, maxLength - 3) + "...";
+		return text.slice(0, maxLength - 1) + "…";
 	}
 }
