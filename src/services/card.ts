@@ -34,7 +34,7 @@ export class CardService extends BaseService {
   }
 
   public getCard(name: string) {
-    const res = this.set.get(name);
+    const res = this.set.get(name.toLowerCase());
     if (!res) {
       return null;
     }
@@ -43,7 +43,7 @@ export class CardService extends BaseService {
   }
 
   public getCards(name: string) {
-    const res = this.set.get(name);
+    const res = this.set.get(name.toLowerCase());
     if (!res) {
       return null;
     }
@@ -69,10 +69,10 @@ export class CardService extends BaseService {
     const cards = fs.readJsonSync("./content/data/cards.json");
 
     cards.forEach((card: ICard) => {
-      this.cardsByName[card.name + card.id] = card;
-      this.cardsByName[card.id] = card;
-      this.set.add(card.name + card.id);
-      this.set.add(card.id);
+      this.cardsByName[(card.name + card.id).toLowerCase()] = card;
+      this.cardsByName[card.id.toLowerCase()] = card;
+      this.set.add((card.name + card.id).toLowerCase());
+      this.set.add(card.id.toLowerCase());
     });
   }
 }

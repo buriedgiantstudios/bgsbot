@@ -59,11 +59,28 @@ export class Bot {
     });
 
     client.on(Discord.Events.InteractionCreate, async (interaction) => {
+      if (interaction.isAutocomplete()) {
+        if (interaction.responded) return;
+        const command = this.commands.get(interaction.commandName);
+
+        if (!command) {
+          console.error(`No command matching ${interaction.commandName} was found.`);
+          return;
+        }
+
+        try {
+          await command.autocomplete?.(interaction);
+        } catch (error) {
+          console.error(error);
+        }
+        return;
+      }
+
       if (!interaction.isRepliable()) return;
       if (interaction.replied) return;
 
       if (interaction.isMessageComponent()) {
-        this.componentService.handleInteraction(interaction);
+        return this.componentService.handleInteraction(interaction);
       }
 
       if (interaction.isChatInputCommand()) {
@@ -71,7 +88,7 @@ export class Bot {
   
         if (!command) {
           console.error(
-            `No command/component matching ${interaction.commandName} was found.`
+            `No command matching ${interaction.commandName} was found.`
           );
           return;
         }
@@ -85,6 +102,7 @@ export class Bot {
             ephemeral: true,
           });
         }
+        return;
       }
 
     });

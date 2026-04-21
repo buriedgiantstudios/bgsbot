@@ -1,5 +1,6 @@
 import {
   ActionRowBuilder,
+  AutocompleteInteraction,
   ChatInputCommandInteraction,
   MessageActionRowComponentBuilder,
   SlashCommandBuilder,
@@ -28,6 +29,7 @@ export class CardCommand implements ICommand {
         .setName("cardname")
         .setDescription("The name of the card to search for.")
         .setRequired(true)
+        .setAutocomplete(true)
     );
 
   public async execute(interaction: ChatInputCommandInteraction) {
@@ -56,5 +58,11 @@ export class CardCommand implements ICommand {
       : undefined;
     await interaction.reply({ embeds: [embed], components: components });
     this.presence.setPresence(`with ${mainCardData.name}`);
+  }
+
+  public async autocomplete(interaction: AutocompleteInteraction) {
+    const cardName = interaction.options.get("cardname")!.value as string
+    const suggestions = this.cardService.getCards(cardName) ?? [];
+    await interaction.respond(suggestions.map((e) => ({ name: `${e.name} (${e.id})`, value: e.name })));
   }
 }

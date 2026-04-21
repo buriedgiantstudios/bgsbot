@@ -4,4 +4,5 @@ import * as Discord from "discord.js";
 export interface ICommand {
   data: Discord.SlashCommandOptionsOnlyBuilder;
   execute: (interaction: Discord.ChatInputCommandInteraction) => Promise<void>;
+  autocomplete?: (interaction: Discord.AutocompleteInteraction) => Promise<void>;
 }

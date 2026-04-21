@@ -25,7 +25,7 @@ export class CardSelect extends BaseMessageComponent<ComponentType.StringSelect>
       data = this.cardRequestCache.get(data)!;
     } else {
       id = this.generateId()
-      data = data.slice(0, 20);
+      data = data.slice(0, 25);
       this.cardRequestCache.set(id, data);
       if (this.cardRequestCache.size > 100) {
         this.cardRequestCache.delete(this.cardRequestCache.firstKey()!)
