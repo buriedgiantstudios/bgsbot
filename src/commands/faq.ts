@@ -1,4 +1,5 @@
 import {
+  AutocompleteInteraction,
   ChatInputCommandInteraction,
   EmbedBuilder,
   SlashCommandBuilder,
@@ -22,6 +23,7 @@ export class FAQCommand implements ICommand {
         .setName("cardname")
         .setDescription("The name of the card to search for.")
         .setRequired(true)
+        .setAutocomplete(true)
     );
 
   public async execute(interaction: ChatInputCommandInteraction) {
@@ -60,5 +62,11 @@ export class FAQCommand implements ICommand {
     await interaction.reply({ embeds: [embed] });
 
     this.presence.setPresence(`with ${cardData.name}`);
+  }
+
+  public async autocomplete(interaction: AutocompleteInteraction) {
+    const cardName = interaction.options.get("cardname")!.value as string
+    const suggestions = this.cardService.getCards(cardName) ?? [];
+    await interaction.respond(suggestions.map((e) => ({ name: `${e.name} (${e.id})`, value: e.name })));
   }
 }
