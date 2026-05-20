@@ -51,7 +51,7 @@ export class FAQCommand implements ICommand {
     const embed = new EmbedBuilder()
       .setTitle(cardData.name)
       .setURL(
-        `https://cards.buriedgiantstudios.com/faq?locale=en-US&productId=${cardData.game}#${cardData.id}`
+        `https://cards.buriedgiant.com/faq?locale=en-US&productId=${cardData.game}#${cardData.id}`
       )
       .setDescription(
         faqData.map((e) => `**Q**: ${e.q}\n**A**: ${e.a}`).join("\n\n")

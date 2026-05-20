@@ -81,7 +81,7 @@ export class RulesService extends BaseService {
   }
 
   public getRuleURL(game: string, rule: IRule): string {
-    return `https://rules.buriedgiantstudios.com/?product=${game}#${this.slugTitle(
+    return `https://rules.buriedgiant.com/?product=${game}#${this.slugTitle(
       rule.index,
       rule.name
     )}`;

@@ -9,24 +9,24 @@ const start = async () => {
   fs.ensureDirSync("content/cards");
   fs.ensureDirSync("content/rules");
 
-  const cards = await fetch("https://cardcdn.buriedgiantstudios.com/cards.json");
+  const cards = await fetch("https://cardcdn.buriedgiant.com/cards.json");
   fs.writeJsonSync("content/data/cards.json", await cards.json());
 
   console.log("cloned cards data");
 
-  const faq = await fetch("https://cardcdn.buriedgiantstudios.com/faq.json");
+  const faq = await fetch("https://cardcdn.buriedgiant.com/faq.json");
   fs.writeJsonSync("content/data/faq.json", await faq.json());
 
   console.log("cloned faq data");
 
-  const errata = await fetch("https://cardcdn.buriedgiantstudios.com/errata.json");
+  const errata = await fetch("https://cardcdn.buriedgiant.com/errata.json");
   fs.writeJsonSync("content/data/errata.json", await errata.json());
 
   console.log("cloned errata data");
 
   console.log("cloning rules");
 
-  const rules = await fetch("https://rules.buriedgiantstudios.com/rules.json");
+  const rules = await fetch("https://rules.buriedgiant.com/rules.json");
   const rulesData = await rules.json();
 
   Object.keys(rulesData).forEach((productId) => {
@@ -48,7 +48,7 @@ const start = async () => {
 
   console.log("cloned rules");
 
-  const meta = await fetch("https://cardcdn.buriedgiantstudios.com/meta.json");
+  const meta = await fetch("https://cardcdn.buriedgiant.com/meta.json");
   const metaData = await meta.json();
   const products = metaData.products;
 

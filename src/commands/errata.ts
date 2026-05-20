@@ -51,7 +51,7 @@ export class ErrataCommand implements ICommand {
     const embed = new EmbedBuilder()
       .setTitle(cardData.name)
       .setURL(
-        `https://cards.buriedgiantstudios.com/errata?locale=en-US&productId=${cardData.game}#${cardData.id}`
+        `https://cards.buriedgiant.com/errata?locale=en-US&productId=${cardData.game}#${cardData.id}`
       )
       .setDescription(errataData.map((e) => `- ${e.text}`).join("\n"))
       .setFooter({ text: cardData.id })

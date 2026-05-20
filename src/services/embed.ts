@@ -16,7 +16,7 @@ export class EmbedService extends BaseService {
   public getCardEmbed(cardData: ICard, faqData: Array<{ q: string, a: string }>, errataData: Array<{ text: string }>) {
     const embed = new Discord.EmbedBuilder()
       .setTitle(cardData.name)
-      .setURL(`https://cards.buriedgiantstudios.com/card/${cardData.id}`)
+      .setURL(`https://cards.buriedgiant.com/card/${cardData.id}`)
       .setFooter({
         text: `${cardData.id} - ${faqData.length} FAQ | ${errataData.length} Errata`,
       })
