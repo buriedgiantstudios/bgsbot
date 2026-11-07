@@ -48,13 +48,13 @@ const start = async () => {
 
   console.log("cloned rules");
 
-  const meta = await fetch("https://cardcdn.buriedgiant.com/meta.json");
+  const meta = await fetch("https://rules.buriedgiant.com/app.json");
   const metaData = await meta.json();
-  const products = metaData.products;
+  const products = metaData.products as Array<Record<string, { name: string }>>;
 
-  const productList = products
-    .filter((p) => p.external.rules && rulesData[p.id])
-    .map((p) => ({ name: p.name, value: p.id }));
+  const productList = Object.entries(products)
+    .filter((p) => rulesData[p[0]])
+    .map((p) => ({ name: p[1].name, value: p[0] }));
   fs.writeJsonSync("content/data/products.json", productList);
 
   console.log("cloned product list");
